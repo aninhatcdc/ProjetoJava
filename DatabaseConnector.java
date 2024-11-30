@@ -8,9 +8,9 @@ public class DatabaseConnector {
 
     public static void main(String[] args) {
 
-        String url = "jdbc:mysql://localhost:3306/meubanco";
+        String url = "jdbc:postgresql://localhost:5432/postgres";
         String usuario = "root";
-        String senha = "suaSenha";
+        String senha = "123";
 
 
         try (Connection conn = DriverManager.getConnection(url, usuario, senha)) {

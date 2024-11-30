@@ -24,22 +24,26 @@
             <div class="content">
                 <h1>Cadastro</h1>
                 <div class="input-group">
-                    <label for="nome">Nome:</label>
+                    <label for="nome">Nome completo:</label>
                     <input type="text" id="nome" name="nome" required placeholder="Digite seu nome">
                 </div>
                 <div class="input-group">
-                    <label for="email">Renda:</label>
-                    <input type="number" id="email" name="renda" required placeholder="Digite sua renda mensal">
+                    <label for="senha">Senha:</label>
+                    <input type="text" id="senha" name="senha" required placeholder="Cadastre uma senha forte">
+                </div>
+                <div class="input-group">
+                    <label for="renda">Renda:</label>
+                    <input type="number" id="renda" name="renda" required placeholder="Digite sua renda mensal">
                 </div>
                 <div class="input-group">
                     <label for="cpf">CPF:</label>
-                    <input type="number" name="cpf" id="">
+                    <input type="text" id="cpf" name="cpf" required placeholder="Digite seu CPF">
                 </div>
                 <div class="input-group">
                     <label for="data">Data de nascimento:</label>
-                    <input type="date" name="data" id="">
+                    <input type="date" id="data" name="data" required>
                 </div>
-                <a href="solicitarconta.html" class="btn">Concluir</a>
+                <button type="button" id="concluir" class="btn">Concluir</button>
             </div>
             <div class="mockups">
                 <img src="dispositivos.png" alt="Mockup de telefone 1">
@@ -53,5 +57,55 @@
         <p>Em caso de dúvidas, contate-nos pelo nosso email:</p>
         <p>bancocentraluniesp@gmail.com</p>
     </footer>
+
+    <script>
+        // Função para enviar os dados do formulário para a API
+        document.getElementById('concluir').addEventListener('click', async function () {
+            // Capturar os valores do formulário
+            const nome = document.getElementById('nome').value;
+            const renda = document.getElementById('renda').value; // Corrigido o id para "renda"
+            const cpf = document.getElementById('cpf').value;
+            const data = document.querySelector('input[name="data"]').value;
+            const senha = document.getElementById('senha').value; 
+
+            // Verificar se os campos obrigatórios foram preenchidos
+            if (!nome || !renda || !cpf || !data || !senha) {
+                alert("Preencha todos os campos!");
+                return;
+            }
+
+            // Montar o objeto com os dados
+            const pessoa = {
+                nome: nome,
+                renda: parseFloat(renda),
+                cpf: cpf,
+                data: data,
+                senha: senha
+            };
+
+            try {
+                // Fazer a requisição POST para a API
+                const response = await fetch('http://localhost:8080/api/pessoas', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(pessoa)
+                });
+
+                if (response.ok) {
+                    const resultado = await response.json();
+                    alert(`Pessoa cadastrada com sucesso! Agencia: ${resultado.agencia} Conta: ${resultado.conta}`);
+                    // Redirecionar para outra página, se necessário
+                    window.location.href = "solicitarconta.html";
+                } else {
+                    alert("Erro ao cadastrar a pessoa. Verifique os dados e tente novamente.");
+                }
+            } catch (error) {
+                console.error("Erro ao cadastrar a pessoa:", error);
+                alert("Erro ao conectar com a API. Tente novamente mais tarde.");
+            }
+        });
+    </script>
 </body>
 </html>
