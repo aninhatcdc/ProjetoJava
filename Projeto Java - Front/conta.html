@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco Central Uniesp</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">Banco Central Uniesp</div>
+            <ul class="menu">
+                <li><a href="paginaprincipal.html" class="btn">Página Inicial</a></li>
+                <li><a href="contato.html" class="btn">Contato</a></li>
+                <li><a href="conta.html" class="btn">Conta</a></li>
+            </ul>
+            <a href="solicitarconta.html" class="btn">Solicitar Conta</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="content">
+                <h1>Digite seus dados:</h1>
+                <div class="input-group">
+                    <label for="cpf">CPF:</label>
+                    <input type="text" name="cpf" id="cpf" required placeholder="Digite o número do seu CPF">
+                </div>
+                <div class="input-group">
+                    <label for="senha">Senha:</label>
+                    <input type="text" name="senha" id="senha" required placeholder="Digite sua senha:">
+                </div>
+                <button type="button" id="entrar" class="btn">Entrar</button>
+            </div>
+            <div class="mockups">
+                <img src="dispositivos.png" alt="Mockup de telefone 1">
+            
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Banco Central Uniesp. Todos os direitos reservados.</p>
+        <p>Em caso de dúvidas, contate-nos pelo nosso email:</p>
+        <p>bancocentraluniesp@gmail.com</p>
+    </footer>
+
+    <script>
+        document.getElementById('entrar').addEventListener('click', async function (e) {
+        e.preventDefault();
+
+        const cpf = document.getElementById('cpf').value;
+        const senha = document.getElementById('senha').value;
+
+        const response = await fetch('http://localhost:8080/api/pessoas/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ cpf, senha })
+        });
+
+        if (response.ok) {
+            const data = await response.json(); // Supondo que a API retorne um objeto com o nome do usuário
+            localStorage.setItem("cpfUsuario", data.cpf);
+            window.location.href = "main.html"; // Substitua pelo caminho da página desejada
+            // Redirecionar ou realizar outra ação
+        } else {
+            alert("CPF ou senha inválidos.");
+        }
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco Central Uniesp</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">Banco Central Uniesp</div>
+            <ul class="menu">
+                <li><a href="paginaprincipal.html" class="btn">Página Inicial</a></li>
+                <li><a href="contato.html" class="btn">Contato</a></li>
+                <li><a href="conta.html" class="btn">Conta</a></li>
+            </ul>
+            <a href="solicitarconta.html" class="btn">Solicitar Conta</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="content">
+                <h1>Banco Central da Universidade</h1>
+                <div id="dadosUsuario">
+                    <!-- Os dados do usuário serão carregados aqui -->
+                </div>
+                <a href="solicitarconta.html" class="btn">Solicitar Conta</a>
+            </div>
+            <div class="mockups">
+                <img src="dispositivos.png" alt="Mockup de telefone 1">
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Banco Central Uniesp. Todos os direitos reservados.</p>
+        <p>Em caso de dúvidas, contate-nos pelo nosso email:</p>
+        <p>bancocentraluniesp@gmail.com</p>
+    </footer>
+
+    <script>
+        // Supondo que o CPF do usuário está salvo no localStorage após o login
+        const cpfUsuario = localStorage.getItem("cpfUsuario");
+
+        if (!cpfUsuario) {
+            alert("Usuário não autenticado. Por favor, faça login.");
+            window.location.href = "conta.html"; // Redirecionar para a página de login
+        } else {
+            // Chamar o endpoint para buscar os dados do usuário
+            fetch(`http://localhost:8080/api/pessoas/${cpfUsuario}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Erro ao buscar dados do usuário.");
+                    }
+                    return response.json();
+                })
+                .then(pessoa => {
+                    // Exibir os dados do usuário no HTML
+                    document.getElementById("dadosUsuario").innerHTML = `
+                        <h2>Bem-vindo(a), ${pessoa.nome}</h2>
+                        <p><strong>CPF:</strong> ${pessoa.cpf}</p>
+                        <p><strong>Agência:</strong> ${pessoa.agencia}</p>
+                        <p><strong>Conta:</strong> ${pessoa.conta}</p>
+                        <p><strong>Saldo:</strong> 
+                            <span id="saldoTexto">R$ ${pessoa.saldo ? pessoa.saldo.toFixed(2) : 0}</span>
+                            <input type="number" id="saldoInput" style="display:none;" value="${pessoa.saldo ? pessoa.saldo.toFixed(2) : 0}">
+                            <button id="editarSaldoBtn" class="btn">Alterar Saldo</button>
+                            <button id="confirmarSaldoBtn" class="btn" style="display:none;">Confirmar</button>
+                        </p>
+                    `;
+
+                    // Associar eventos aos botões
+                    document.getElementById("editarSaldoBtn").addEventListener("click", () => habilitarEdicaoSaldo());
+                    document.getElementById("confirmarSaldoBtn").addEventListener("click", () => salvarSaldo(cpfUsuario));
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert("Erro ao carregar dados do usuário.");
+                });
+        }
+
+        // Função para habilitar o modo de edição
+        function habilitarEdicaoSaldo() {
+            document.getElementById("saldoTexto").style.display = "none";
+            document.getElementById("saldoInput").style.display = "inline";
+            document.getElementById("editarSaldoBtn").style.display = "none";
+            document.getElementById("confirmarSaldoBtn").style.display = "inline";
+        }
+
+        // Função para salvar o saldo no backend
+        function salvarSaldo(cpf) {
+            const novoSaldo = parseFloat(document.getElementById("saldoInput").value);
+
+            if (isNaN(novoSaldo) || novoSaldo < 0) {
+                alert("Por favor, insira um valor válido para o saldo.");
+                return;
+            }
+
+            fetch(`http://localhost:8080/api/pessoas/alterar-saldo`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ cpf, novoSaldo })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Erro ao alterar o saldo.");
+                    }
+                    return response.json();
+                })
+                .then(pessoaAtualizada => {
+                    alert("Saldo atualizado com sucesso!");
+                    // Atualizar o saldo exibido
+                    document.getElementById("saldoTexto").textContent = `R$ ${pessoaAtualizada.saldo.toFixed(2)}`;
+                    // Restaurar o modo de visualização
+                    document.getElementById("saldoTexto").style.display = "inline";
+                    document.getElementById("saldoInput").style.display = "none";
+                    document.getElementById("editarSaldoBtn").style.display = "inline";
+                    document.getElementById("confirmarSaldoBtn").style.display = "none";
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert("Erro ao alterar o saldo.");
+                });
+        }
+    </script>
+</body>
+</html>
