@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco Central Uniesp</title>
+    <link rel="stylesheet" href="style2.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">Banco Central Uniesp</div>
+            <ul class="menu">
+                <li><a href="paginaprincipal.html" class="btn">Página Inicial</a></li>
+                <li><a href="contato.html" class="btn">Contato</a></li>
+                <li><a href="conta.html" class="btn">Conta</a></li>
+            </ul>
+            <a href="solicitarconta.html" class="btn">Solicitar Conta</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="content">
+                <h1>Cadastro</h1>
+                <div class="input-group">
+                    <label for="nome">Nome completo:</label>
+                    <input type="text" id="nome" name="nome" required placeholder="Digite seu nome">
+                </div>
+                <div class="input-group">
+                    <label for="senha">Senha:</label>
+                    <input type="text" id="senha" name="senha" required placeholder="Cadastre uma senha forte">
+                </div>
+                <div class="input-group">
+                    <label for="renda">Renda:</label>
+                    <input type="number" id="renda" name="renda" required placeholder="Digite sua renda mensal">
+                </div>
+                <div class="input-group">
+                    <label for="cpf">CPF:</label>
+                    <input type="text" id="cpf" name="cpf" required placeholder="Digite seu CPF">
+                </div>
+                <div class="input-group">
+                    <label for="data">Data de nascimento:</label>
+                    <input type="date" id="data" name="data" required>
+                </div>
+                <button type="button" id="concluir" class="btn">Concluir</button>
+            </div>
+            <div class="mockups">
+                <img src="dispositivos.png" alt="Mockup de telefone 1">
+            
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Banco Central Uniesp. Todos os direitos reservados.</p>
+        <p>Em caso de dúvidas, contate-nos pelo nosso email:</p>
+        <p>bancocentraluniesp@gmail.com</p>
+    </footer>
+
+    <script>
+        // Função para enviar os dados do formulário para a API
+        document.getElementById('concluir').addEventListener('click', async function () {
+            // Capturar os valores do formulário
+            const nome = document.getElementById('nome').value;
+            const renda = document.getElementById('renda').value; // Corrigido o id para "renda"
+            const cpf = document.getElementById('cpf').value;
+            const data = document.querySelector('input[name="data"]').value;
+            const senha = document.getElementById('senha').value; 
+
+            // Verificar se os campos obrigatórios foram preenchidos
+            if (!nome || !renda || !cpf || !data || !senha) {
+                alert("Preencha todos os campos!");
+                return;
+            }
+
+            // Montar o objeto com os dados
+            const pessoa = {
+                nome: nome,
+                renda: parseFloat(renda),
+                cpf: cpf,
+                data: data,
+                senha: senha
+            };
+
+            try {
+                // Fazer a requisição POST para a API
+                const response = await fetch('http://localhost:8080/api/pessoas', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(pessoa)
+                });
+
+                if (response.ok) {
+                    const resultado = await response.json();
+                    alert(`Pessoa cadastrada com sucesso! Agencia: ${resultado.agencia} Conta: ${resultado.conta}`);
+                    // Redirecionar para outra página, se necessário
+                    window.location.href = "solicitarconta.html";
+                } else {
+                    alert("Erro ao cadastrar a pessoa. Verifique os dados e tente novamente.");
+                }
+            } catch (error) {
+                console.error("Erro ao cadastrar a pessoa:", error);
+                alert("Erro ao conectar com a API. Tente novamente mais tarde.");
+            }
+        });
+    </script>
+</body>
+</html>
